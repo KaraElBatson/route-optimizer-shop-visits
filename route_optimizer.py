@@ -233,13 +233,59 @@ class RouteOptimizer:
                 "arrival_time": (current_time + timedelta(hours=sum(r["estimated_time_minutes"] / 60 for r in route_details))).strftime("%H:%M")
             })
 
+        # Generate optimized address order for Google Maps
+        optimized_addresses = [addresses[i] for i in route[:-1]]
+
+        # Generate Google Maps link
+        google_maps_link = self.generate_google_maps_link(optimized_addresses)
+
         return {
             "total_distance_km": round(total_distance, 2),
             "total_time_minutes": round(total_time_hours * 60, 1),
             "traffic_factor": traffic_factor,
             "route": route_details,
-            "optimized_order": [addresses[i] for i in route[:-1]]
+            "optimized_order": optimized_addresses,
+            "google_maps_link": google_maps_link
         }
+
+    def generate_google_maps_link(self, addresses: List[str]) -> str:
+        """
+        Generate Google Maps directions link for the optimized route
+        """
+        if not addresses or len(addresses) < 2:
+            return ""
+
+        # Start with the first address as origin
+        origin = addresses[0]
+        # Last address as destination
+        destination = addresses[-1]
+
+        # Middle addresses as waypoints (max 25 waypoints for Google Maps)
+        waypoints = addresses[1:-1] if len(addresses) > 2 else []
+
+        # Limit waypoints to 25 (Google Maps limitation)
+        if len(waypoints) > 25:
+            print(f"Warning: Google Maps supports max 25 waypoints. Using first 25 of {len(waypoints)} stops.")
+            waypoints = waypoints[:25]
+
+        # Build the URL
+        base_url = "https://www.google.com/maps/dir/?api=1"
+
+        # URL encode addresses
+        from urllib.parse import quote
+        origin_encoded = quote(origin)
+        destination_encoded = quote(destination)
+
+        # Build waypoints string
+        waypoints_str = ""
+        if waypoints:
+            waypoints_encoded = [quote(addr) for addr in waypoints]
+            waypoints_str = "&waypoints=" + "|".join(waypoints_encoded)
+
+        # Complete URL
+        maps_url = f"{base_url}&origin={origin_encoded}&destination={destination_encoded}{waypoints_str}&travelmode=driving"
+
+        return maps_url
 
     def save_route_to_excel(self, route_data: Dict, output_file: str):
         """
@@ -247,12 +293,16 @@ class RouteOptimizer:
         """
         df = pd.DataFrame(route_data["route"])
 
+        # Generate Google Maps link
+        google_maps_link = route_data.get("google_maps_link", "")
+
         # Add summary information
         summary = pd.DataFrame([{
             "Total Distance (km)": route_data["total_distance_km"],
             "Total Time (minutes)": route_data["total_time_minutes"],
             "Traffic Factor": route_data["traffic_factor"],
-            "Optimization Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "Optimization Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "Google Maps Link": google_maps_link
         }])
 
         with pd.ExcelWriter(output_file) as writer:
@@ -260,6 +310,8 @@ class RouteOptimizer:
             df.to_excel(writer, sheet_name='Optimized Route', index=False)
 
         print(f"Optimized route saved to {output_file}")
+        if google_maps_link:
+            print(f"\nGoogle Maps Link:\n{google_maps_link}")
 
 def main():
     parser = argparse.ArgumentParser(description='Optimize route for shop visits')
@@ -314,6 +366,12 @@ def main():
     print("="*60)
     print("Route optimization complete!")
     print("="*60)
+
+    # Display Google Maps link
+    if route_data.get("google_maps_link"):
+        print("\nOpen this route in Google Maps:")
+        print(route_data["google_maps_link"])
+        print("="*60)
 
 if __name__ == "__main__":
     main()

@@ -40,6 +40,7 @@ python route_optimizer.py dosya.xlsx --address_column "Dükkan Adresleri"
 ✅ **Trafik Optimizasyonu**: Saate göre trafik yoğunluğunu hesaba alır
 ✅ **Zaman Hesaplama**: Her durak için tahmini varış saatini gösterir
 ✅ **Google Maps Entegrasyonu**: Daha kesin konum bilgisi için API desteği
+✅ **Google Maps Link Oluşturma**: Optimize edilmiş rotayı Google Maps'te görüntülemek için tıklanabilir link oluşturur
 ✅ **Excel Çıktısı**: Optimizasyon sonuçlarını Excel dosyasına kaydeder
 
 ## Trafik Faktörleri
@@ -52,8 +53,19 @@ python route_optimizer.py dosya.xlsx --address_column "Dükkan Adresleri"
 
 Script çalıştığında:
 1. Konsolda rota özetini gösterir
-2. Optimizasyon detaylarını içeren bir Excel dosyası oluşturur
-3. Toplam mesafe, süre ve rota sırasını içerir
+2. **Google Maps Linki**: Optimize edilmiş rotayı Google Maps'te açmak için tıklanabilir URL oluşturur
+3. Optimizasyon detaylarını içeren bir Excel dosyası oluşturur
+4. Toplam mesafe, süre ve rota sırasını içerir
+
+### Google Maps Linki
+
+Script otomatik olarak bir Google Maps Yol Tarifi linki oluşturur:
+- İlk adres başlangıç noktası olarak ayarlanır
+- Son adres varış noktası olarak ayarlanır
+- Aradaki tüm adresler ara duraklar (waypoints) olarak eklenir (maksimum 25 ara durak desteklenir)
+- Adresler optimize edilmiş sırada düzenlenir
+
+Konsol çıktısında veya Excel dosyasındaki linke tıklayarak rotanın tamamını Google Maps'te görüntüleyebilirsiniz.
 
 ## Notlar
 

@@ -8,6 +8,7 @@ A Python script that optimizes routes for visiting multiple shops/addresses, con
 - **Traffic Optimization**: Considers traffic density based on time of day
 - **Time Calculation**: Estimates arrival times for each stop
 - **Google Maps Integration**: Optional API support for more accurate location data
+- **Google Maps Link Generation**: Automatically creates a clickable link to view the optimized route in Google Maps
 - **Excel Output**: Saves optimization results to Excel files
 - **Multi-language Support**: Works with Turkish addresses and location names
 
@@ -68,7 +69,8 @@ The script considers different traffic conditions throughout the day:
 
 The script generates:
 1. **Console Output**: Route summary with total distance, time, and optimized order
-2. **Excel File**: Two sheets - Summary and detailed route information
+2. **Google Maps Link**: A clickable URL to view the entire route in Google Maps
+3. **Excel File**: Two sheets - Summary and detailed route information
 
 ### Excel Output Structure
 
@@ -77,6 +79,7 @@ The script generates:
 - Total time in minutes
 - Traffic factor used
 - Optimization timestamp
+- Google Maps link (clickable URL to view route)
 
 **Optimized Route Sheet:**
 - Stop number
@@ -85,6 +88,16 @@ The script generates:
 - Distance between stops
 - Estimated travel time
 - Arrival time
+
+### Google Maps Link
+
+The script automatically generates a Google Maps Directions link with:
+- First address as the origin
+- Last address as the destination
+- All intermediate addresses as waypoints (up to 25 waypoints supported)
+- Optimized in the correct visiting order
+
+Simply click the link in the console output or Excel file to open the complete route in Google Maps.
 
 ## Excel File Requirements
 
